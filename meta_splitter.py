@@ -41,15 +41,28 @@ from models import BankRow, MatchStatus, MetaInvoiceOCR, RowType, SplitRow
 # ---------------------------------------------------------------------------
 
 
-def lookup_brand_dimensions(ad_set_name: Optional[str]) -> dict[str, str]:
+def lookup_brand_dimensions(
+    ad_set_name: Optional[str],
+    override: Optional[dict[str, dict[str, str]]] = None,
+) -> dict[str, str]:
     """Return SAP dimensions for an ad set name via case-insensitive keyword scan.
 
-    First match wins (insertion order of BRAND_KEYWORD_MAP). Falls back to
-    DEFAULT_BRAND_MAP when no keyword matches or the input is empty.
+    Resolution order:
+      1. `override` (per-session CSV uploaded in the UI) — if provided
+      2. config.BRAND_KEYWORD_MAP (defaults shipped in code)
+      3. DEFAULT_BRAND_MAP fallback
+
+    First match wins within each map (insertion order). The override takes
+    precedence so finance can correct or extend the mapping for one run
+    without re-deploying the app.
     """
     name = (ad_set_name or "").lower()
     if not name:
         return dict(DEFAULT_BRAND_MAP)
+    if override:
+        for keyword, dims in override.items():
+            if keyword and keyword.lower() in name:
+                return dict(dims)
     for keyword, dims in BRAND_KEYWORD_MAP.items():
         if keyword in name:
             return dict(dims)
@@ -65,6 +78,7 @@ def split_meta_transaction(
     bank_row: BankRow,
     meta_ocr: MetaInvoiceOCR,
     start_line: int = 1,
+    brand_override: Optional[dict[str, dict[str, str]]] = None,
 ) -> list[SplitRow]:
     """Split one Meta bank row into 2N SplitRow records (N = number of campaigns).
 
@@ -129,7 +143,7 @@ def split_meta_transaction(
 
     # Spend rows first
     for c, spend_sgd_d in zip(meta_ocr.campaigns, spend_sgds):
-        dims = lookup_brand_dimensions(c.ad_set_name)
+        dims = lookup_brand_dimensions(c.ad_set_name, brand_override)
         rows.append(
             SplitRow(
                 description=build_meta_spend_description(
@@ -159,7 +173,7 @@ def split_meta_transaction(
 
     # VAT rows in the same order
     for c, vat_sgd_d in zip(meta_ocr.campaigns, vat_sgds):
-        dims = lookup_brand_dimensions(c.ad_set_name)
+        dims = lookup_brand_dimensions(c.ad_set_name, brand_override)
         # Per-campaign VAT in VND, displayed in the description as a rounded
         # integer (matches the reviewed-output convention, e.g. 356.8 -> 357).
         campaign_vat_vnd_int = int(
