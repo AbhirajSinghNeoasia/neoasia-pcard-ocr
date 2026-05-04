@@ -1,0 +1,39 @@
+# --- Secrets ---------------------------------------------------------------
+.streamlit/secrets.toml
+.env
+*.key
+
+# --- Test fixtures (business-confidential, large) --------------------------
+test_data/
+
+# --- Python ----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# --- Virtual environments --------------------------------------------------
+.venv/
+venv/
+env/
+
+# --- Build artefacts -------------------------------------------------------
+build/
+dist/
+*.egg-info/
+
+# --- Editor / OS -----------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# --- Streamlit local cache -------------------------------------------------
+.streamlit/cache/
+
+# --- Claude Code local settings --------------------------------------------
+.claude/settings.local.json
