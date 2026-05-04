@@ -1,0 +1,17 @@
+# Neoasia P-Card OCR — Streamlit theme configuration.
+# Colours track the official Neoasia palette (see config.py COLORS).
+
+[theme]
+primaryColor             = "#004d71"   # Neoasia primary dark — buttons, focus, primary accents
+backgroundColor          = "#f6f8fb"   # Page background — soft neutral
+secondaryBackgroundColor = "#e7eff8"   # Cards, sidebar, expander headers
+textColor                = "#333333"
+font                     = "sans serif"
+
+[server]
+headless    = true
+runOnSave   = false
+maxUploadSize = 50            # MB — large enough for the Meta invoices zip
+
+[browser]
+gatherUsageStats = false
