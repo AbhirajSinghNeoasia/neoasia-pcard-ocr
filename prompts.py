@@ -57,7 +57,9 @@ Rules:
 """
 
 
-META_INVOICE_PROMPT = """You are an expert at extracting structured campaign-level data from Meta (Facebook) advertising invoice PDFs for a Singapore-based company called Neoasia.
+META_INVOICE_PROMPT = """CRITICAL: Your entire response must be a single JSON object. No prose, no verification text, no thinking, no markdown. Start your response with { and end with }. Any non-JSON output will cause a system failure.
+
+You are an expert at extracting structured campaign-level data from Meta (Facebook) advertising invoice PDFs for a Singapore-based company called Neoasia.
 
 These invoices are billed in Vietnamese Dong (VND) for Neoasia's Vietnam ad operations. Each invoice covers a single transaction (one charge to a card) and lists the ad campaigns that were funded by that charge.
 
@@ -95,7 +97,7 @@ CRITICAL rules:
 
    You must extract every AD SET (child) and ONLY ad sets — never the campaign group header. If a group has 3 ad sets you output 3 entries; if a group has 1 ad set you output 1 entry. Even if there is only one campaign group with one ad set, you still output that ad set as a campaigns entry.
 
-5. The sum of all campaigns[].spend_vnd MUST equal subtotal_vnd. Verify this BEFORE responding. If the numbers do not reconcile, you have probably misread an ad set amount or accidentally included a group total — re-examine the invoice.
+5. The sum of all campaigns[].spend_vnd MUST equal subtotal_vnd. If the numbers do not reconcile, re-examine the invoice and correct the amounts. Do NOT output any verification text, working, or commentary — ONLY the JSON object.
 
 6. Use the EXACT ad set name as printed: preserve casing, hyphens, embedded dates, special characters. Do not standardise, translate, or shorten the name.
 

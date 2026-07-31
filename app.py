@@ -105,7 +105,7 @@ def inject_chrome_css() -> None:
           .block-container {{
             padding-top: 1.25rem !important;
             padding-bottom: 4rem !important;
-            max-width: 1400px;
+            max-width: 98%;
           }}
 
           /* ---- Brand header bar ---- */
